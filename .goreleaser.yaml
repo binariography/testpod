@@ -28,28 +28,18 @@ builds:
       - darwin
     goarch:
       - amd64
-      - arm64
     # ensures mod timestamp to be the commit timestamp
-    mod_timestamp: "{{ .CommitTimestamp }}"
-    flags:
-      - -trimpath
     ldflags:
       # use commit date instead of current date as main.date
       # only needed if you actually use those things in your main package, otherwise can be ignored.
-      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }}
-
-# create a source tarball
-# https://goreleaser.com/customization/source/
-source:
-  enabled: true
-  name_template: "{{ .ProjectName }}.src"
+      - -s -w -X main.commit={{.Commit}}
 
 # config the archives filenames, format, and other options.
 # https://goreleaser.com/customization/archive
 archives:
   - format: tar.gz
     wrap_in_directory: true
-    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     files:
       -  LICENSE
     builds_info:
@@ -57,10 +47,10 @@ archives:
 
 # creates SBOMs of all archives and the source tarball using syft
 # https://goreleaser.com/customization/sbom
-sboms:
-  - artifacts: archive
-  - id: source # Two different sbom configurations need two different IDs
-    artifacts: source
+#sboms:
+#  - artifacts: archive
+#  - id: source # Two different sbom configurations need two different IDs
+#    artifacts: source
 
 # config the checksum filename
 # https://goreleaser.com/customization/checksum
@@ -70,26 +60,26 @@ checksum:
 # signs the checksum file
 # all files (including the sboms) are included in the checksum, so we don't need to sign each one if we don't want to
 # https://goreleaser.com/customization/sign
-signs:
-  - cmd: cosign
-    certificate: "${artifact}.pem"
-    args:
-      - sign-blob
-      - "--output-certificate=${certificate}"
-      - "--output-signature=${signature}"
-      - "${artifact}"
-      - "--yes"
-    artifacts: checksum
-    output: true
+#signs:
+#  - cmd: cosign
+#    certificate: "${artifact}.pem"
+#    args:
+#      - sign-blob
+#      - "--output-certificate=${certificate}"
+#      - "--output-signature=${signature}"
+#      - "${artifact}"
+#      - "--yes"
+#    artifacts: checksum
+#    output: true
 
 # create a docker image
 # https://goreleaser.com/customization/dockers_v2
 dockers_v2:
   - images:
-      - "ghcr.io/goreleaser/example-secure"
+      - "ciavash/testpod"
     tags:
       - latest
-      - "{{ .Tag }}"
+      - "1.0.1"
     dockerfile: Dockerfile
     labels:
       org.opencontainers.image.created: "{{.Date}}"
@@ -97,16 +87,15 @@ dockers_v2:
       org.opencontainers.image.revision: "{{.FullCommit}}"
       org.opencontainers.image.version: "{{.Version}}"
       org.opencontainers.image.source: "{{.GitURL}}"
-      org.opencontainers.image.description: "Example goreleaser + github actions config with pinned actions, SAST, keyless signing, SBOM generation, and attestations"
-    annotations:
-      "org.opencontainers.image.description": "Example goreleaser + github actions config with pinned actions, SAST, keyless signing, SBOM generation, and attestations"
+        #    annotations:
+        #"org.opencontainers.image.description": "Example goreleaser + github actions config with pinned actions, SAST, keyless signing, SBOM generation, and attestations"
 
 # signs our docker image
 # https://goreleaser.com/customization/docker_sign
-docker_signs:
-  - cmd: cosign
-    output: true
-    args:
-      - "sign"
-      - "${artifact}"
-      - "--yes"
+#docker_signs:
+#  - cmd: cosign
+#    output: true
+#    args:
+#      - "sign"
+#      - "${artifact}"
+#      - "--yes"
