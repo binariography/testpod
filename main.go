@@ -70,11 +70,18 @@ func initLog() *slog.Logger {
 
 func main() {
 
+	logger := initLog()
 	var srvConf http.Config
 
 	arg.MustParse(&srvConf)
-	logger := initLog()
+	hostname, err := os.Hostname()
 
+	// At this stage Hostname is not important for running the server
+	// only A warning log
+	if err != nil {
+		logger.Warn("Cannot Retrieve Hostname", "Error", err)
+	}
+	srvConf.Hostname = hostname
 	srv, _ := http.NewServer(&srvConf, logger)
 
 	//Start HTTP server
