@@ -15,14 +15,15 @@ import (
 )
 
 type Config struct {
+	Hostname     string
 	Host         string        `arg:"--host,env:HOST" default:"localhost"`
-	WriteTimeout time.Duration `arg:"--write-timeout,env:WRITE_TIMEOUT" default:15`
-	ReadTimeout  time.Duration `arg:"--read-timeout,env:READ_TIMEOUT" default:15`
-	IdleTimeout  time.Duration `arg:"--idle-timeout,env:IDLE_TIMEOUT" default:60`
+	WriteTimeout time.Duration `arg:"--write-timeout,env:WRITE_TIMEOUT" default:"15s"`
+	ReadTimeout  time.Duration `arg:"--read-timeout,env:READ_TIMEOUT" default:"15s"`
+	IdleTimeout  time.Duration `arg:"--idle-timeout,env:IDLE_TIMEOUT" default:"60s"`
 	Port         int           `arg:"--port,env:PORT" default:"8081" help:"Port that server is listening on"`
 	PortMetrics  int           `arg:"--port-metrics,env:PORT_METRICS" default:"9090" help:"Port that Prometheus is listening on"`
-	Hostname     string
-	LogLevel     string `arg:"--log-level,env:LOG_LEVEL" default:"info" help:"set log level"`
+	LogLevel     string        `arg:"--log-level,env:LOG_LEVEL" default:"info" help:"set log level"`
+	BackendURL   string        `arg:"--backend-url,env:BACKEND_URL" help:"set backend service URL"`
 }
 
 var T = true
@@ -64,7 +65,7 @@ func (s *Server) ListenAndServe() *http.Server {
 
 func (s *Server) registerHandlers() {
 	s.router.HandleFunc("/info", s.infoHandler)
-	s.router.HandleFunc("/relay/{text}", s.RelayHandler)
+	s.router.HandleFunc("/relay/{text}", s.RelayHandler).Methods("POST")
 }
 
 func (s *Server) registerMiddlewares() {
