@@ -1,0 +1,7 @@
+apiVersion: v2
+name: goldfish
+description: A simple Go web server with OpenTelemetry
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
