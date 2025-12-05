@@ -28,6 +28,7 @@ otel:
   enabled: true
   endpoint: "http://otel-collector.default.svc.cluster.local:4317"
 
+# Canary deploymnet
 traffic:
   stableLabel: stable
   canaryLabel: canary
