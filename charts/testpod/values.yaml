@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  repository: mydockerhub/myapp
+  repository: ciavash/testpod
   tag: "latest"
   pullPolicy: IfNotPresent
 
