@@ -20,3 +20,4 @@ spec:
         host: {{ include "myapp.fullname" . }}
         subset: {{ .Values.traffic.canaryLabel }}
       mirrorPercent: 100
+      {{ end }}
