@@ -1,0 +1,24 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: istio-ingressgateway
+  namespace: istio-system
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: gateway
+      version: 1.28.1     # ← adjust to your Istio version
+      sourceRef:
+        kind: HelmRepository
+        name: istio
+        namespace: flux-system
+  install:
+    createNamespace: true
+  values:
+    service:
+      type: LoadBalancer
+    autoscaling:
+      enabled: true
+      minReplicas: 1
+      maxReplicas: 3
