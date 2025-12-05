@@ -25,13 +25,6 @@ handleFunc := func(pattern string,
 
 func NewMiddleware(operation string, opts ...Option) func(http.Handler) http.Handler
 
-
-
-
-
-
-
-
 */
 
 package http
@@ -39,39 +32,61 @@ package http
 import (
 	"context"
 
+	"github.com/binariography/testpod/pkg/version"
 	"github.com/gorilla/mux"
-	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/contrib/propagators/aws/xray"
+	"go.opentelemetry.io/contrib/propagators/b3"
+	"go.opentelemetry.io/contrib/propagators/jaeger"
+	"go.opentelemetry.io/contrib/propagators/ot"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"go.opentelemetry.io/otel/trace"
-
-	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
+	"go.opentelemetry.io/otel/trace/noop"
 )
 
 var (
-	instrumentationName = "testpod"
+	instrumentationName = "github.com/binariography/testpod/pkg/http"
 )
 
 func (s *Server) initTracer(ctx context.Context) {
-	//traceExporter, _ := stdouttrace.New(
-	//	stdouttrace.WithPrettyPrint())
-	traceExporter, _ := stdouttrace.New()
+	if s.config.OtelService == "" {
+		noop := noop.NewTracerProvider()
+		s.tracer = noop.Tracer("")
+		return
+	}
 
+	traceExporter, _ := otlptracehttp.New(ctx)
 	s.tracerProvider = sdktrace.NewTracerProvider(
 		sdktrace.WithBatcher(traceExporter),
-	)
+		sdktrace.WithResource(resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceNameKey.String(s.config.OtelService),
+			semconv.ServiceVersionKey.String(version.VERSION),
+		)))
 
 	otel.SetTracerProvider(s.tracerProvider)
+	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
+		propagation.TraceContext{},
+		propagation.Baggage{},
+		b3.New(),
+		&jaeger.Jaeger{},
+		&ot.OT{},
+		&xray.Propagator{},
+	))
 
 	s.tracer = s.tracerProvider.Tracer(
 		instrumentationName,
-		trace.WithInstrumentationVersion("1.0.1"),
+		trace.WithInstrumentationVersion(version.VERSION),
 		trace.WithSchemaURL(semconv.SchemaURL),
 	)
 
 }
 
-func NewOtelMiddleware() mux.MiddlewareFunc {
-	return otelmux.Middleware("testpod-front")
+func NewOtelMiddleware(srv string) mux.MiddlewareFunc {
+	return otelhttp.NewMiddleware(srv)
 }

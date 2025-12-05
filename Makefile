@@ -10,7 +10,7 @@ test: tidy fmt vet
 	$(GO) test ./...
 
 build:
-	$(GO) build -ldflags "-s -w" -o ./bin/$(IMAGE_NAME)
+	$(GO) build -ldflags "-s -w" -o ./bin/$(NAME)
 
 tidy:
 	rm -f go.sum; $(GO) mod tidy -compat=1.25
