@@ -6,6 +6,7 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -15,14 +16,16 @@ import (
 )
 
 type Config struct {
-	Host         string        `arg:"--host,env:HOST" default:"localhost"`
-	WriteTimeout time.Duration `arg:"--write-timeout,env:WRITE_TIMEOUT" default:15`
-	ReadTimeout  time.Duration `arg:"--read-timeout,env:READ_TIMEOUT" default:15`
-	IdleTimeout  time.Duration `arg:"--idle-timeout,env:IDLE_TIMEOUT" default:60`
+	Hostname     string
+	Host         string        `arg:"--host,env:HOST" default:""`
+	WriteTimeout time.Duration `arg:"--write-timeout,env:WRITE_TIMEOUT" default:"15s"`
+	ReadTimeout  time.Duration `arg:"--read-timeout,env:READ_TIMEOUT" default:"15s"`
+	IdleTimeout  time.Duration `arg:"--idle-timeout,env:IDLE_TIMEOUT" default:"60s"`
 	Port         int           `arg:"--port,env:PORT" default:"8081" help:"Port that server is listening on"`
 	PortMetrics  int           `arg:"--port-metrics,env:PORT_METRICS" default:"9090" help:"Port that Prometheus is listening on"`
-	Hostname     string
-	LogLevel     string `arg:"--log-level,env:LOG_LEVEL" default:"info" help:"set log level"`
+	LogLevel     string        `arg:"--log-level,env:LOG_LEVEL" default:"info" help:"set log level"`
+	BackendURL   string        `arg:"--backend-url,env:BACKEND_URL" help:"set backend service URL"`
+	OtelService  string        `arg:"--otel-service,env:OTEL_SERVICE" default:"" help:""service name for reporting to open telemetry address, when not set tracing is disabled""`
 }
 
 var T = true
@@ -32,6 +35,7 @@ type Server struct {
 	config         *Config
 	logger         *slog.Logger
 	tracer         trace.Tracer
+	env            []string
 	tracerProvider *sdktrace.TracerProvider
 }
 
@@ -40,6 +44,7 @@ func NewServer(config *Config, logger *slog.Logger) (*Server, error) {
 		router: mux.NewRouter(),
 		config: config,
 		logger: logger,
+		env:    os.Environ(),
 	}
 
 	return srv, nil
@@ -64,13 +69,13 @@ func (s *Server) ListenAndServe() *http.Server {
 
 func (s *Server) registerHandlers() {
 	s.router.HandleFunc("/info", s.infoHandler)
-	s.router.HandleFunc("/relay/{text}", s.RelayHandler)
+	s.router.HandleFunc("/relay/{text}", s.RelayHandler).Methods("POST")
 }
 
 func (s *Server) registerMiddlewares() {
 	prom := NewMetricMiddleware()
 	s.router.Use(prom.Handler)
-	httpTracer := NewOtelMiddleware()
+	httpTracer := NewOtelMiddleware(s.config.OtelService)
 	s.router.Use(httpTracer)
 	httpLogger := NewLoggingMiddleware(s.logger)
 	s.router.Use(httpLogger.Handler)
@@ -79,7 +84,7 @@ func (s *Server) registerMiddlewares() {
 func (s *Server) startServer() *http.Server {
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", s.config.Host, s.config.Port),
+		Addr:    fmt.Sprintf(":%d", s.config.Port),
 		Handler: s.router,
 	}
 
@@ -106,7 +111,7 @@ func (s *Server) startMetricServer() {
 	s.logger.Info("Starting metrics server",
 		"port", s.config.PortMetrics)
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", s.config.PortMetrics),
+		Addr:    fmt.Sprintf("%s:%d", s.config.Host, s.config.PortMetrics),
 		Handler: mux,
 	}
 	if err := srv.ListenAndServe(); err != nil {

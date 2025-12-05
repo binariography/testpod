@@ -1,0 +1,17 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ include "myapp.fullname" . }}-dr
+spec:
+  host: {{ include "myapp.fullname" . }}
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+    - name: {{ .Values.traffic.stableLabel }}
+      labels:
+        version: {{ .Values.traffic.stableLabel }}
+    - name: {{ .Values.traffic.canaryLabel }}
+      labels:
+        version: {{ .Values.traffic.canaryLabel }}
+

@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-type Data struct {
+type Info struct {
 	Title   string
 	Headers map[string]string
 	EnvVars []string
@@ -15,11 +15,12 @@ type Data struct {
 func (s *Server) infoHandler(w http.ResponseWriter, r *http.Request) {
 	_, span := s.tracer.Start(r.Context(), "infohandler")
 	defer span.End()
-	httpBody := Data{}
+
+	httpBody := Info{}
 	httpBody.Title = s.config.Hostname
 	httpBody.Headers = make(map[string]string)
 	httpBody.EnvVars = os.Environ()
-	s.logger.Info("headers retrieved", "headers", r.Header)
+
 	for k, v := range r.Header {
 		httpBody.Headers[k] = strings.Join(v, ", ")
 	}
