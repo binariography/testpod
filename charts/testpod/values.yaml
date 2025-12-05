@@ -28,6 +28,12 @@ otel:
   enabled: true
   endpoint: "http://otel-collector.default.svc.cluster.local:4317"
 
+traffic:
+  stableLabel: stable
+  canaryLabel: canary
+  canaryWeight: 0
+  mirror: false
+
 # Istio
 istio:
   sidecarInject: true
