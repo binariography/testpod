@@ -24,7 +24,7 @@ spec:
   interval: 1m
   chart:
     spec:
-      chart: testpod
+      chart: charts/testpod
       version: '0.1.0'
       sourceRef:
         kind: GitRepository
