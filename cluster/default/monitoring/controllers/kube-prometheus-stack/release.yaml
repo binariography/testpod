@@ -40,4 +40,4 @@ spec:
       adminPassword: flux
       service:
         type: "NodePort"
-        nodePort: 31000
+        nodePort: 30001
