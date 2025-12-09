@@ -13,7 +13,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./clusters/default/monitoring/controllers
+  path: ./cluster/default/monitoring/controllers
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -31,4 +31,4 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./clusters/default/monitoring/configs
+  path: ./cluster/default/monitoring/configs
