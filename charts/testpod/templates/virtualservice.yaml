@@ -1,3 +1,4 @@
+{{- if .Values.istio.enabled }}
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
@@ -30,3 +31,4 @@ spec:
         subset: {{ .Values.traffic.canaryLabel }}
       mirrorPercent: 100
       {{ end }}
+{{ end }}     
