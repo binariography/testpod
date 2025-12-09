@@ -1,0 +1,35 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: testpod
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  ref:
+    branch: enhancement
+  url: https://github.com/binariography/testpod
+  ignore: |
+    # exclude all
+    /*
+    # include charts directory
+    !/charts/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: testpod
+  namespace: default
+spec:
+  interval: 1m
+  chart:
+    spec:
+      chart: testpod
+      version: '0.1.0'
+      sourceRef:
+        kind: GitRepository
+        name: testpod
+        namespace: flux-system
+      interval: 1m
+  values:
+    replicaCount: 2
