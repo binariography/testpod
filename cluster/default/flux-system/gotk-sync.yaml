@@ -17,7 +17,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m0s
-  path: ./clusters/default
+  path: ./cluster/default
   prune: true
   sourceRef:
     kind: GitRepository
