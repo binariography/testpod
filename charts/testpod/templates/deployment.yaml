@@ -1,18 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "myapp.fullname" . }}
+  name: {{ include "app.fullname" . }}
   labels:
-    app: {{ include "myapp.name" . }}
+    app: {{ include "app.name" . }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ include "myapp.name" . }}
+      app: {{ include "app.name" . }}
   template:
     metadata:
       labels:
-        app: {{ include "myapp.name" . }}
+        app: {{ include "app.name" . }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ .Values.service.metricsPort }}"
     spec:
       containers:
         - name: {{ .Chart.Name }}

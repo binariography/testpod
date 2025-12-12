@@ -10,6 +10,7 @@ service:
   nodePort: 30002
   port: 8081
   targetPort: 8081
+  metricsPort: 9090
 
 resources:
   requests:

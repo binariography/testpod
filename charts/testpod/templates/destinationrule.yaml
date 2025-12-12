@@ -2,9 +2,9 @@
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
-  name: {{ include "myapp.fullname" . }}-dr
+  name: {{ include "app.fullname" . }}-dr
 spec:
-  host: {{ include "myapp.fullname" . }}
+  host: {{ include "app.fullname" . }}
   trafficPolicy:
     tls:
       mode: ISTIO_MUTUAL

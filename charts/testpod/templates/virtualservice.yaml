@@ -11,23 +11,23 @@ spec:
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: {{ include "myapp.fullname" . }}-vs
+  name: {{ include "app.fullname" . }}-vs
 spec:
   hosts:
-    - "{{ include "myapp.fullname" . }}"
+    - "{{ include "app.fullname" . }}"
   http:
     - route:
         - destination:
-            host: {{ include "myapp.fullname" . }}
+            host: {{ include "app.fullname" . }}
             subset: {{ .Values.traffic.stableLabel }}
           weight: {{ sub 100 .Values.traffic.canaryWeight }}
         - destination:
-            host: {{ include "myapp.fullname" . }}
+            host: {{ include "app.fullname" . }}
             subset: {{ .Values.traffic.canaryLabel }}
           weight: {{ .Values.traffic.canaryWeight }}
       {{- if .Values.traffic.mirror }}      
       mirror:
-        host: {{ include "myapp.fullname" . }}
+        host: {{ include "app.fullname" . }}
         subset: {{ .Values.traffic.canaryLabel }}
       mirrorPercent: 100
       {{ end }}
