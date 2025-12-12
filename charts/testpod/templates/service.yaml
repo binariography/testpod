@@ -11,5 +11,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app.kubernetes.io/name: {{ include "app.name" . }}
+    app: {{ include "app.name" . }}
 
