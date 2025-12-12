@@ -19,5 +19,6 @@ spec:
           - image-automation-controller
           - image-reflector-controller
           - webapp
+          - testpod
   podMetricsEndpoints:
     - port: http-prom
