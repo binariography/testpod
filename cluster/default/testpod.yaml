@@ -25,7 +25,7 @@ spec:
   chart:
     spec:
       chart: charts/testpod
-      version: '0.1.0'
+      version: '0.1.5'
       sourceRef:
         kind: GitRepository
         name: testpod
