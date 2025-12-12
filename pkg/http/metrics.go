@@ -20,16 +20,17 @@ func NewMetricMiddleware() *PrometheusMiddleware {
 			Name:      "requests_total",
 			Help:      "The total number of HTTP requests.",
 		},
-		[]string{"status"},
+		[]string{"code", "method"},
 	)
 
 	// duration is partitioned by the HTTP method and handler. It uses custom
 	// buckets based on the expected request duration.
 	duration := prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name:    "request_duration_seconds",
-			Help:    "A histogram of latencies for requests.",
-			Buckets: []float64{.25, .5, 1, 2.5, 5, 10},
+			Subsystem: "http",
+			Name:      "request_duration_seconds",
+			Help:      "A histogram of latencies for requests.",
+			Buckets:   []float64{.25, .5, 1, 2.5, 5, 10},
 		},
 		[]string{"handler", "method"},
 	)
