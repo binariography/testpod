@@ -2,6 +2,6 @@ apiVersion: v2
 name: testpod
 description: A simple Go web server with OpenTelemetry
 type: application
-version: 0.1.6
-appVersion: "1.0.2"
+version: 0.1.7
+appVersion: "1.0.3"
 
