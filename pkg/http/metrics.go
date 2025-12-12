@@ -16,10 +16,11 @@ func NewMetricMiddleware() *PrometheusMiddleware {
 
 	counter := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "api_requests_total",
-			Help: "A counter for requests to the wrapped handler.",
+			Subsystem: "http",
+			Name:      "requests_total",
+			Help:      "The total number of HTTP requests.",
 		},
-		[]string{"code", "method"},
+		[]string{"status"},
 	)
 
 	// duration is partitioned by the HTTP method and handler. It uses custom
