@@ -21,5 +21,10 @@ spec:
           - image-reflector-controller
           - webapp
           - testpod
-  podMetricsEndpoints:
-    - port: http-prom
+  endpoints:
+  - path: /metrics
+    port: http-web
+  - path: /metrics
+    port: reloader-web
+  - path: /metrics
+    port: http-prom
