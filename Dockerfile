@@ -1,5 +1,5 @@
 # --- STEP 1: Build Stage ---
-FROM golang:1.21-alpine AS builder
+FROM golang:1.25-alpine AS builder
 WORKDIR /app
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o main main.go
@@ -11,7 +11,7 @@ ENTRYPOINT ["/main"]
 
 # --- STEP 3: Debug/Test Target ---
 FROM alpine:latest AS debug
-RUN apk add --no-cache curl bind9 iputils jq
+RUN apk add --no-cache curl bindutils iputils jq
 COPY --from=builder /main /main
 ENTRYPOINT ["/main"]
 
