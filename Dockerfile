@@ -11,7 +11,7 @@ ENTRYPOINT ["/main"]
 
 # --- STEP 3: Debug/Test Target ---
 FROM alpine:latest AS debug
-RUN apk add --no-cache curl bind9-host iputils jq
+RUN apk add --no-cache curl bind9 iputils jq
 COPY --from=builder /main /main
 ENTRYPOINT ["/main"]
 
