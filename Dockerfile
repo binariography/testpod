@@ -6,7 +6,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o main main.go
 
 # --- STEP 2: Production Target ---
 FROM scratch AS release
-COPY --from=builder /main /main
+COPY --from=builder main /main
 ENTRYPOINT ["/main"]
 
 # --- STEP 3: Debug/Test Target ---
