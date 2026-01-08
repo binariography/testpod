@@ -2,12 +2,15 @@ replicaCount: 2
 
 image:
   repository: ciavash/testpod
-  tag: "latest"
+  tag: 1.0.3
   pullPolicy: IfNotPresent
 
 service:
-  type: ClusterIP
-  port: 8080
+  type: NodePort
+  nodePort: 30002
+  port: 8081
+  targetPort: 8081
+  metricsPort: 9090
 
 resources:
   requests:
@@ -18,7 +21,7 @@ resources:
     memory: 512Mi
 
 autoscaling:
-  enabled: true
+  enabled: false
   minReplicas: 2
   maxReplicas: 5
   targetCPUUtilizationPercentage: 70
@@ -28,8 +31,16 @@ otel:
   enabled: true
   endpoint: "http://otel-collector.default.svc.cluster.local:4317"
 
+# Canary deploymnet
+traffic:
+  stableLabel: stable
+  canaryLabel: canary
+  canaryWeight: 0
+  mirror: false
+
 # Istio
 istio:
+  enabled: false
   sidecarInject: true
   mTLS: true
   rateLimit:

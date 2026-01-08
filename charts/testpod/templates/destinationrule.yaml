@@ -1,9 +1,10 @@
+{{- if .Values.istio.enabled }}
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
-  name: {{ include "myapp.fullname" . }}-dr
+  name: {{ include "app.fullname" . }}-dr
 spec:
-  host: {{ include "myapp.fullname" . }}
+  host: {{ include "app.fullname" . }}
   trafficPolicy:
     tls:
       mode: ISTIO_MUTUAL
@@ -14,4 +15,4 @@ spec:
     - name: {{ .Values.traffic.canaryLabel }}
       labels:
         version: {{ .Values.traffic.canaryLabel }}
-
+{{ end }}

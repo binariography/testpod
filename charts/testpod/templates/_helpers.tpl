@@ -1,8 +1,8 @@
-{{- define "myapp.name" -}}
+{{- define "app.name" -}}
 {{ .Chart.Name }}
 {{- end -}}
 
-{{- define "myapp.fullname" -}}
+{{- define "app.fullname" -}}
 {{ .Release.Name }}-{{ .Chart.Name }}
 {{- end -}}
 

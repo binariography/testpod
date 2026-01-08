@@ -16,8 +16,9 @@ func NewMetricMiddleware() *PrometheusMiddleware {
 
 	counter := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "api_requests_total",
-			Help: "A counter for requests to the wrapped handler.",
+			Subsystem: "http",
+			Name:      "requests_total",
+			Help:      "The total number of HTTP requests.",
 		},
 		[]string{"code", "method"},
 	)
@@ -26,9 +27,10 @@ func NewMetricMiddleware() *PrometheusMiddleware {
 	// buckets based on the expected request duration.
 	duration := prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name:    "request_duration_seconds",
-			Help:    "A histogram of latencies for requests.",
-			Buckets: []float64{.25, .5, 1, 2.5, 5, 10},
+			Subsystem: "http",
+			Name:      "request_duration_seconds",
+			Help:      "A histogram of latencies for requests.",
+			Buckets:   []float64{.25, .5, 1, 2.5, 5, 10},
 		},
 		[]string{"handler", "method"},
 	)
